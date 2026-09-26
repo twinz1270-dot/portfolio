@@ -26,12 +26,18 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe("<ContactForm />", () => {
-  it("renders all required fields and submit button", () => {
+  it("renders inquiry fields and submit button", () => {
     render(<ContactForm />);
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/company \/ brand/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/project type/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/budget/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/timeline/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /send message/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /start a conversation/i })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "SaaS" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "AI Interface" })).toBeInTheDocument();
   });
 
   it("shows inline validation errors for client-side invalid input", async () => {
@@ -40,7 +46,7 @@ describe("<ContactForm />", () => {
     await user.type(screen.getByLabelText(/name/i), "X");
     await user.type(screen.getByLabelText(/email/i), "not-an-email");
     await user.type(screen.getByLabelText(/message/i), "short");
-    await user.click(screen.getByRole("button", { name: /send message/i }));
+    await user.click(screen.getByRole("button", { name: /start a conversation/i }));
 
     expect(await screen.findByText(/name must be at least 2/i)).toBeInTheDocument();
     expect(screen.getByText(/invalid email/i)).toBeInTheDocument();
@@ -56,10 +62,10 @@ describe("<ContactForm />", () => {
     const user = userEvent.setup();
     render(<ContactForm />);
     await fillValidForm(user);
-    await user.click(screen.getByRole("button", { name: /send message/i }));
+    await user.click(screen.getByRole("button", { name: /start a conversation/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/message sent/i)).toBeInTheDocument();
+      expect(screen.getByText("MESSAGE RECEIVED.")).toBeInTheDocument();
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
@@ -77,6 +83,27 @@ describe("<ContactForm />", () => {
     }));
   });
 
+  it("includes selected project inquiry details in the existing API request", async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true }) });
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await fillValidForm(user);
+    await user.type(screen.getByLabelText(/company \/ brand/i), "Studio North");
+    await user.selectOptions(screen.getByLabelText(/project type/i), "SaaS");
+    await user.selectOptions(screen.getByLabelText(/budget/i), "$1,000 – $3,000");
+    await user.selectOptions(screen.getByLabelText(/timeline/i), "1–2 months");
+    await user.click(screen.getByRole("button", { name: /start a conversation/i }));
+
+    await waitFor(() => expect(screen.getByText("MESSAGE RECEIVED.")).toBeInTheDocument());
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body).toEqual(expect.objectContaining({
+      company: "Studio North",
+      projectType: "SaaS",
+      budget: "$1,000 – $3,000",
+      timeline: "1–2 months",
+    }));
+  });
+
   it("renders 'Send another' which resets the form", async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
@@ -85,13 +112,13 @@ describe("<ContactForm />", () => {
     const user = userEvent.setup();
     render(<ContactForm />);
     await fillValidForm(user);
-    await user.click(screen.getByRole("button", { name: /send message/i }));
+    await user.click(screen.getByRole("button", { name: /start a conversation/i }));
 
     const reset = await screen.findByRole("button", { name: /send another/i });
     await user.click(reset);
 
     // Form is back
-    expect(screen.getByRole("button", { name: /send message/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /start a conversation/i })).toBeInTheDocument();
   });
 
   it("shows API error message on non-2xx response and surfaces field details", async () => {
@@ -105,7 +132,7 @@ describe("<ContactForm />", () => {
     const user = userEvent.setup();
     render(<ContactForm />);
     await fillValidForm(user);
-    await user.click(screen.getByRole("button", { name: /send message/i }));
+    await user.click(screen.getByRole("button", { name: /start a conversation/i }));
 
     expect(await screen.findByText(/invalid form data/i)).toBeInTheDocument();
     expect(screen.getByText(/server says this is bad/i)).toBeInTheDocument();
@@ -116,7 +143,7 @@ describe("<ContactForm />", () => {
     const user = userEvent.setup();
     render(<ContactForm />);
     await fillValidForm(user);
-    await user.click(screen.getByRole("button", { name: /send message/i }));
+    await user.click(screen.getByRole("button", { name: /start a conversation/i }));
 
     expect(await screen.findByText(/network error/i)).toBeInTheDocument();
   });
@@ -131,7 +158,7 @@ describe("<ContactForm />", () => {
     const user = userEvent.setup();
     render(<ContactForm />);
     await fillValidForm(user);
-    await user.click(screen.getByRole("button", { name: /send message/i }));
+    await user.click(screen.getByRole("button", { name: /start a conversation/i }));
 
     expect(await screen.findByText(/sending/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/name/i)).toBeDisabled();
@@ -140,7 +167,7 @@ describe("<ContactForm />", () => {
 
     resolve({ ok: true, json: async () => ({ ok: true }) });
     await waitFor(() => {
-      expect(screen.getByText(/message sent/i)).toBeInTheDocument();
+      expect(screen.getByText("MESSAGE RECEIVED.")).toBeInTheDocument();
     });
   });
 

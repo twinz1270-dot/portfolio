@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowUpRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { validateContactForm, type ContactFieldErrors } from "@/lib/contact-validation";
+import { PROJECT_BUDGETS, PROJECT_TIMELINES, PROJECT_TYPES } from "@/lib/contact-options";
 
 type Status =
   | { kind: "idle" }
@@ -62,13 +64,16 @@ export default function ContactForm() {
 
   if (status.kind === "ok") {
     return (
-      <div
+      <motion.div
         role="status"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
         className="flex flex-col items-center gap-3 rounded-2xl border border-primary/30 bg-primary/5 p-8 text-center"
       >
         <CheckCircle2 className="text-primary" size={32} />
-        <p className="text-base font-medium text-white">Message sent — thanks!</p>
-        <p className="text-sm text-text-secondary">I&apos;ll get back to you as soon as I can.</p>
+        <p className="font-display text-xl font-semibold text-white">MESSAGE RECEIVED.</p>
+        <p className="text-sm text-text-secondary">Thanks for reaching out.<br />I&apos;ll get back to you soon.</p>
         <button
           type="button"
           onClick={() => setStatus({ kind: "idle" })}
@@ -76,7 +81,7 @@ export default function ContactForm() {
         >
           Send another
         </button>
-      </div>
+      </motion.div>
     );
   }
 
@@ -87,7 +92,7 @@ export default function ContactForm() {
       onSubmit={onSubmit}
       noValidate
       className="space-y-4 rounded-2xl border border-white/[0.08] bg-[#050812]/85 p-6 text-left shadow-2xl shadow-primary/5 backdrop-blur-xl sm:p-7"
-      aria-label="Contact form"
+      aria-label="Project inquiry form"
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
@@ -102,7 +107,7 @@ export default function ContactForm() {
             required
             disabled={sending}
             className={inputClass}
-            placeholder="Ada Lovelace"
+            placeholder="Your name"
             aria-invalid={Boolean(errors.name)}
             aria-describedby={errors.name ? "contact-name-error" : undefined}
           />
@@ -123,7 +128,7 @@ export default function ContactForm() {
             required
             disabled={sending}
             className={inputClass}
-            placeholder="ada@example.com"
+            placeholder="you@example.com"
             aria-invalid={Boolean(errors.email)}
             aria-describedby={errors.email ? "contact-email-error" : undefined}
           />
@@ -131,6 +136,59 @@ export default function ContactForm() {
             <p id="contact-email-error" className="mt-1.5 text-xs text-red-400">{errors.email[0]}</p>
           )}
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="contact-company" className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-text-secondary">
+          Company / Brand <span className="normal-case text-text-secondary/50">(optional)</span>
+        </label>
+        <input
+          id="contact-company"
+          name="company"
+          type="text"
+          autoComplete="organization"
+          maxLength={120}
+          disabled={sending}
+          className={inputClass}
+          placeholder="Company or product name"
+          aria-invalid={Boolean(errors.company)}
+          aria-describedby={errors.company ? "contact-company-error" : undefined}
+        />
+        {errors.company && <p id="contact-company-error" className="mt-1.5 text-xs text-red-400">{errors.company[0]}</p>}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="contact-project-type" className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-text-secondary">
+            Project Type
+          </label>
+          <select id="contact-project-type" name="projectType" disabled={sending} className={`${inputClass} appearance-none`} defaultValue="" aria-invalid={Boolean(errors.projectType)} aria-describedby={errors.projectType ? "contact-project-type-error" : undefined}>
+            <option value="">Select a project type</option>
+            {PROJECT_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+          </select>
+          {errors.projectType && <p id="contact-project-type-error" className="mt-1.5 text-xs text-red-400">{errors.projectType[0]}</p>}
+        </div>
+        <div>
+          <label htmlFor="contact-budget" className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-text-secondary">
+            Budget
+          </label>
+          <select id="contact-budget" name="budget" disabled={sending} className={`${inputClass} appearance-none`} defaultValue="" aria-invalid={Boolean(errors.budget)} aria-describedby={errors.budget ? "contact-budget-error" : undefined}>
+            <option value="">Select a budget</option>
+            {PROJECT_BUDGETS.map((budget) => <option key={budget} value={budget}>{budget}</option>)}
+          </select>
+          {errors.budget && <p id="contact-budget-error" className="mt-1.5 text-xs text-red-400">{errors.budget[0]}</p>}
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="contact-timeline" className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-text-secondary">
+          Timeline
+        </label>
+        <select id="contact-timeline" name="timeline" disabled={sending} className={`${inputClass} appearance-none`} defaultValue="" aria-invalid={Boolean(errors.timeline)} aria-describedby={errors.timeline ? "contact-timeline-error" : undefined}>
+          <option value="">Select a timeline</option>
+          {PROJECT_TIMELINES.map((timeline) => <option key={timeline} value={timeline}>{timeline}</option>)}
+        </select>
+        {errors.timeline && <p id="contact-timeline-error" className="mt-1.5 text-xs text-red-400">{errors.timeline[0]}</p>}
       </div>
 
       <div>
@@ -144,7 +202,7 @@ export default function ContactForm() {
           required
           disabled={sending}
           className={`${inputClass} resize-y`}
-          placeholder="Tell me about your project, idea, or just say hi…"
+          placeholder="Tell me about the project, goals, or interface you have in mind."
           aria-invalid={Boolean(errors.message)}
           aria-describedby={errors.message ? "contact-message-error" : undefined}
         />
@@ -169,7 +227,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={sending}
-        className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-primary/35 bg-primary/15 px-6 py-3 text-sm font-semibold uppercase tracking-wider text-white transition-all duration-200 hover:border-primary/55 hover:bg-primary/25 hover:shadow-[0_0_22px_rgba(129,84,255,0.14)] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
       >
         {sending ? (
           <>
@@ -178,8 +236,8 @@ export default function ContactForm() {
           </>
         ) : (
           <>
-            <Send size={16} className="transition-transform group-hover:translate-x-0.5" />
-            Send message
+            START A CONVERSATION
+            <ArrowUpRight size={16} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </>
         )}
       </button>

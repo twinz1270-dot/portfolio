@@ -4,6 +4,7 @@ import { useRef, useCallback, useEffect } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { planetPositions } from "./SolarSystem";
+import { projects } from "@/lib/projects";
 
 function smootherstep(t: number): number {
   t = Math.max(0, Math.min(1, t));
@@ -37,18 +38,22 @@ interface Keyframe {
 // from the actual section positions so the camera stays in sync with the cards
 // regardless of total page height.
 function buildDefaultKeyframes(): Keyframe[] {
-  const S = 1 / 8;
+  const projectStart = 3 / 8;
+  const projectEnd = 6 / 8;
+  const projectSpacing = (projectEnd - projectStart) / Math.max(projects.length - 1, 3);
   return [
-    { t: 0,       pos: [0, 4, 18], look: [0, 0, 0], planet: -1 },
-    { t: S * 0.8, pos: [0, 1.5, 7], look: [0, 0, 0], planet: -1 },
-    { t: S * 1.3, pos: [0, 0.2, -2], look: [5, 0, -10], planet: -1 },
-    { t: S * 2,   pos: [SC.x, 28, SC.z + 10], look: [SC.x, 0, SC.z], planet: -1 },
-    { t: S * 3,   pos: [0, 0, 0], look: [0, 0, 0], planet: 0 },
-    { t: S * 4,   pos: [0, 0, 0], look: [0, 0, 0], planet: 1 },
-    { t: S * 5,   pos: [0, 0, 0], look: [0, 0, 0], planet: 2 },
-    { t: S * 6,   pos: [0, 0, 0], look: [0, 0, 0], planet: 3 },
-    { t: S * 7,   pos: [SC.x - 8, 14, SC.z + 25], look: [SC.x, 0, SC.z], planet: -1 },
-    { t: 1.00,    pos: [5, 12, 40], look: [15, 0, -5], planet: -1 },
+    { t: 0, pos: [0, 4, 18], look: [0, 0, 0], planet: -1 },
+    { t: 0.1, pos: [0, 1.5, 7], look: [0, 0, 0], planet: -1 },
+    { t: 0.1625, pos: [0, 0.2, -2], look: [5, 0, -10], planet: -1 },
+    { t: 0.25, pos: [SC.x, 28, SC.z + 10], look: [SC.x, 0, SC.z], planet: -1 },
+    ...projects.map((_, index) => ({
+      t: projectStart + projectSpacing * index,
+      pos: [0, 0, 0] as [number, number, number],
+      look: [0, 0, 0] as [number, number, number],
+      planet: index,
+    })),
+    { t: 0.875, pos: [SC.x - 8, 14, SC.z + 25], look: [SC.x, 0, SC.z], planet: -1 },
+    { t: 1, pos: [5, 12, 40], look: [15, 0, -5], planet: -1 },
   ];
 }
 
@@ -71,9 +76,9 @@ function computeKeyframes(): Keyframe[] {
   }
 
   // Pin the post-planet keyframe to start right after the last planet ends.
-  const lastPlanetIdx = kf.findIndex((k) => k.planet === 3);
+  const lastPlanetIdx = kf.findIndex((k) => k.planet === projects.length - 1);
   if (lastPlanetIdx >= 0 && lastPlanetIdx + 1 < kf.length) {
-    const lastEl = document.getElementById("project-3");
+    const lastEl = document.getElementById(`project-${projects.length - 1}`);
     if (lastEl) {
       const bottom =
         lastEl.getBoundingClientRect().bottom + window.scrollY;

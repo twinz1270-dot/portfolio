@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Linkedin, Mail, Download } from "lucide-react";
+import { Github, Linkedin, Mail, Link2, ArrowUpRight } from "lucide-react";
 import { personalInfo } from "@/lib/constants";
 import GradientText from "@/components/ui/GradientText";
 import ScrollReveal from "@/components/ui/ScrollReveal";
@@ -11,6 +11,7 @@ const iconMap: Record<string, React.ComponentType<{ size?: number; className?: s
   github: Github,
   linkedin: Linkedin,
   mail: Mail,
+  portfolio: Link2,
 };
 
 export default function Contact() {
@@ -28,95 +29,86 @@ export default function Contact() {
         <ScrollReveal>
           <div className="flex items-center justify-center gap-4">
             <div className="h-px w-12 bg-gradient-to-r from-transparent to-primary/30" />
-            <span className="font-display text-sm font-medium tracking-widest text-primary/60 uppercase">04</span>
+            <span className="font-display text-sm font-medium tracking-widest text-primary/60 uppercase">07</span>
             <div className="h-px w-12 bg-gradient-to-l from-transparent to-primary/30" />
           </div>
         </ScrollReveal>
 
         <ScrollReveal delay={0.05}>
           <GradientText as="h2" className="mt-4 text-center font-display text-3xl font-bold sm:text-4xl md:text-5xl">
-            Let&apos;s Work Together
+            <span className="block">LET&apos;S BUILD</span>
+            <span className="block">SOMETHING.</span>
           </GradientText>
         </ScrollReveal>
 
         <ScrollReveal delay={0.1}>
           <p className="mx-auto mt-4 max-w-xl text-center text-base leading-relaxed text-text-secondary md:text-lg">
-            Whether you need a developer, have an idea worth building,
-            or just want to talk tech — I&apos;m always open to connecting.
+            Have a project, product idea, or interface that needs to be brought to life? Let&apos;s talk.
           </p>
         </ScrollReveal>
 
-        {/* Two-column on desktop, stacked on mobile */}
-        <div className="mt-10 grid gap-8 lg:mt-12 lg:grid-cols-[1.2fr_1fr] lg:gap-10">
+        <div className="mt-10 grid gap-10 lg:mt-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <ScrollReveal delay={0.15}>
-            <ContactForm />
-          </ScrollReveal>
-
-          <ScrollReveal delay={0.2}>
-            <div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-white/[0.06] bg-galaxy-dark/40 p-6 backdrop-blur-md">
+            <div className="flex h-full flex-col justify-between gap-8">
               {/* Direct email */}
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-widest text-text-secondary/60">
-                  Or email directly
+                  Direct contact
                 </h3>
-                <a
-                  href={`mailto:${personalInfo.email}`}
-                  className="mt-2 block break-all font-medium text-primary underline-offset-4 hover:underline"
-                >
-                  {personalInfo.email}
-                </a>
-                <p className="mt-1 text-xs text-text-secondary/60">{personalInfo.location}</p>
-              </div>
-
-              {/* CV downloads */}
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-text-secondary/60">
-                  Download CV
-                </h3>
-                <div className="mt-2 flex flex-col gap-2">
+                {personalInfo.email ? (
                   <a
-                    href="/Pedro_Marques_CV_Software_Developer.pdf"
-                    download
-                    className="group flex items-center justify-between gap-2 rounded-lg border border-glass-border bg-galaxy-darker/60 px-4 py-2.5 text-sm font-medium text-text-secondary transition-all duration-300 hover:border-primary/30 hover:text-white"
+                    href={`mailto:${personalInfo.email}`}
+                    className="mt-3 inline-flex items-center gap-2 font-display text-lg font-medium text-white transition-colors hover:text-primary-light sm:text-xl"
                   >
-                    <span>Software Engineering</span>
-                    <Download size={14} className="transition-colors group-hover:text-primary" />
+                    {personalInfo.email}
+                    <ArrowUpRight size={16} className="text-primary-light" />
                   </a>
-                  <a
-                    href="/Pedro_Marques_CV_Data_Scientist.pdf"
-                    download
-                    className="group flex items-center justify-between gap-2 rounded-lg border border-glass-border bg-galaxy-darker/60 px-4 py-2.5 text-sm font-medium text-text-secondary transition-all duration-300 hover:border-primary/30 hover:text-white"
-                  >
-                    <span>Data Science</span>
-                    <Download size={14} className="transition-colors group-hover:text-primary" />
-                  </a>
-                </div>
+                ) : (
+                  <p className="mt-2 font-medium text-text-secondary">Email address to add</p>
+                )}
+                {personalInfo.location && (
+                  <p className="mt-1 text-xs text-text-secondary/60">{personalInfo.location}</p>
+                )}
               </div>
 
               {/* Social links */}
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-widest text-text-secondary/60">
-                  Find me on
+                  Profiles
                 </h3>
-                <div className="mt-2 flex items-center gap-2">
+                <div className="mt-3 flex flex-wrap gap-x-6 gap-y-3">
                   {personalInfo.socials.map((social) => {
                     const Icon = iconMap[social.icon] || Mail;
-                    return (
+                    const className = "inline-flex min-h-10 items-center gap-2 text-sm text-text-secondary transition-colors hover:text-white";
+                    return social.url ? (
                       <a
                         key={social.name}
                         href={social.url}
                         target={social.url.startsWith("mailto") ? undefined : "_blank"}
                         rel="noopener noreferrer"
-                        className="group flex h-10 w-10 items-center justify-center rounded-lg border border-glass-border bg-galaxy-darker/60 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30"
-                        aria-label={social.name}
+                        className={className}
                       >
-                        <Icon size={16} className="text-text-secondary transition-colors group-hover:text-primary" />
+                        <Icon size={16} />
+                        <span>{social.name} ↗</span>
                       </a>
+                    ) : (
+                      <span key={social.name} className={className} aria-label={`${social.name} placeholder`}>
+                        <Icon size={16} className="text-text-secondary/60" />
+                        <span>{social.name} <span className="text-text-secondary/50">(add link)</span></span>
+                      </span>
                     );
                   })}
                 </div>
               </div>
             </div>
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.2}>
+            <div className="mb-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-text-secondary/70" aria-label="Project types welcome">
+              <span>Frontend projects welcome:</span>
+              <span>SaaS</span><span>E-Commerce</span><span>Web Apps</span><span>Dashboards</span><span>AI</span><span>Business</span><span>Booking</span><span>UI / UX</span><span>Interactive</span>
+            </div>
+            <ContactForm />
           </ScrollReveal>
         </div>
       </div>

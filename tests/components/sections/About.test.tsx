@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import About from "@/components/sections/About";
-import { personalInfo } from "@/lib/constants";
 
 vi.mock("@gsap/react", () => ({
   useGSAP: (cb: () => void) => cb(),
@@ -19,25 +18,31 @@ describe("<About />", () => {
   it("renders the section heading", () => {
     render(<About />);
     expect(
-      screen.getByRole("heading", { level: 2, name: /about me/i }),
+      screen.getByRole("heading", { level: 2, name: /^about me$/i }),
     ).toBeInTheDocument();
   });
 
-  it("renders the bio from constants", () => {
+  it("renders Laiba's frontend and UI/UX positioning", () => {
     render(<About />);
-    expect(screen.getByText(personalInfo.bio)).toBeInTheDocument();
+    expect(screen.getByText(/Frontend Developer and Software Engineering graduate/i)).toBeInTheDocument();
+    expect(screen.getByText(/intersection of frontend engineering and UI\/UX/i)).toBeInTheDocument();
+    expect(screen.getByText(/Where thoughtful design meets frontend engineering/i)).toBeInTheDocument();
   });
 
-  it("renders the location badge", () => {
+  it("renders the supplied location, focus, and interests", () => {
     render(<About />);
-    expect(screen.getByText(personalInfo.location)).toBeInTheDocument();
+    expect(screen.getByText("Islamabad, Pakistan")).toBeInTheDocument();
+    expect(screen.getByText("Frontend Development")).toBeInTheDocument();
+    expect(screen.getByText(/SaaS · E-Commerce · Web Applications/)).toBeInTheDocument();
   });
 
-  it("renders all stats", () => {
+  it("renders languages and professional strengths without numeric claims", () => {
     render(<About />);
-    for (const stat of personalInfo.stats) {
-      expect(screen.getByText(stat.value)).toBeInTheDocument();
-      expect(screen.getByText(stat.label)).toBeInTheDocument();
-    }
+    expect(screen.getByRole("heading", { name: "Languages" })).toBeInTheDocument();
+    expect(screen.getByText("English")).toBeInTheDocument();
+    expect(screen.getByText("Urdu")).toBeInTheDocument();
+    expect(screen.getByText("German")).toBeInTheDocument();
+    expect(screen.getByText("A1 · Goethe Certified")).toBeInTheDocument();
+    expect(screen.getByText(/Problem Solving · Attention to Detail · Communication · Teamwork · Adaptability/)).toBeInTheDocument();
   });
 });

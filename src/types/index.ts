@@ -1,19 +1,27 @@
 export interface Project {
-  id: string;
+  slug: string;
   title: string;
+  shortTitle: string;
+  category: string;
   description: string;
-  longDescription?: string;
+  role?: string;
+  year?: number | string;
   technologies: string[];
-  image: string;
-  demoUrl?: string;
+  image?: string;
+  gallery?: string[];
+  video?: string;
+  liveUrl?: string;
   githubUrl?: string;
-  hasDemo?: boolean;
+  caseStudyUrl?: string;
   featured?: boolean;
+  projectType: "ui-ux" | "frontend";
+  status: "temporary" | "planned" | "in-progress" | "published" | "archived";
 }
 
 export interface SkillCategory {
   name: string;
   skills: Skill[];
+  description?: string;
 }
 
 export interface Skill {
@@ -35,10 +43,4 @@ export interface PersonalInfo {
   email: string;
   location: string;
   socials: SocialLink[];
-  stats: Stat[];
-}
-
-export interface Stat {
-  label: string;
-  value: string;
 }

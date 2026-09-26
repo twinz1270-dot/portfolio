@@ -10,9 +10,13 @@ vi.mock("resend", () => ({
 const VALID = {
   name: "Ada Lovelace",
   email: "ada@example.com",
+  company: "Studio North",
+  projectType: "SaaS",
+  budget: "$1,000 – $3,000",
+  timeline: "1–2 months",
   message: "Hello there!",
   website: "",
-};
+} as const;
 
 beforeEach(() => {
   vi.resetModules();
@@ -43,16 +47,18 @@ describe("sendContactEmail", () => {
     expect(arg.subject).toContain(VALID.name);
     expect(arg.text).toContain(VALID.message);
     expect(arg.html).toContain(VALID.message);
+    expect(arg.text).toContain("Project Type: SaaS");
+    expect(arg.html).toContain("Studio North");
   });
 
   it("uses CONTACT_FROM_EMAIL when set", async () => {
-    process.env.CONTACT_FROM_EMAIL = "hello@pedromarques.dev";
+    process.env.CONTACT_FROM_EMAIL = "hello@example.com";
     sendMock.mockResolvedValueOnce({ data: { id: "msg_2" }, error: null });
     const { sendContactEmail } = await import("@/lib/email");
 
     await sendContactEmail(VALID);
 
-    expect(sendMock.mock.calls[0][0].from).toBe("hello@pedromarques.dev");
+    expect(sendMock.mock.calls[0][0].from).toBe("hello@example.com");
   });
 
   it("escapes HTML in name/email/message to prevent injection", async () => {

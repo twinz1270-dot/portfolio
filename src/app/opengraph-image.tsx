@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export const alt = "Pedro Marques — Full-Stack Developer & Data Scientist";
+export const alt = "Laiba Kabeer — Frontend Developer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -92,7 +92,7 @@ export default function Image() {
               marginTop: 8,
             }}
           >
-            Pedro Marques
+            Laiba Kabeer
           </div>
 
           {/* Divider */}
@@ -113,7 +113,7 @@ export default function Image() {
               fontWeight: 500,
             }}
           >
-            Full-Stack Developer & Data Scientist
+            Frontend Developer
           </div>
 
           {/* Subtitle */}
@@ -127,7 +127,7 @@ export default function Image() {
               marginTop: 4,
             }}
           >
-            Building intelligent, immersive digital experiences
+            Building modern, responsive web interfaces with React
           </div>
         </div>
       </div>

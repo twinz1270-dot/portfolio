@@ -39,7 +39,7 @@ export default function Navigation() {
     setMobileOpen(false);
     const el = document.querySelector(href);
     if (el && lenis) {
-      lenis.scrollTo(el as HTMLElement, { offset: -80 });
+      lenis.scrollTo(el as HTMLElement, { offset: 0 });
     }
   };
 
@@ -54,14 +54,12 @@ export default function Navigation() {
       <motion.nav
         role="navigation"
         aria-label="Main navigation"
+        data-scrolled={isScrolled}
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
         className={cn(
-          "fixed top-4 left-1/2 z-50 -translate-x-1/2 rounded-2xl px-2 py-2 transition-all duration-500",
-          isScrolled
-            ? "glass shadow-lg shadow-black/20"
-            : "bg-transparent"
+          "nav-galaxy-shell fixed top-4 left-1/2 z-50 -translate-x-1/2 rounded-2xl px-2 py-2 transition-all duration-500",
         )}
       >
         {/* Desktop Nav */}
@@ -75,7 +73,7 @@ export default function Navigation() {
                   aria-label={`Navigate to ${link.label} section`}
                   aria-current={isActive ? "page" : undefined}
                   className={cn(
-                    "relative rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300",
+                    "nav-galaxy-link relative rounded-xl px-2 py-2 text-sm font-medium transition-all duration-300",
                     isActive
                       ? "text-white"
                       : "text-text-secondary hover:text-white/80"
@@ -84,7 +82,7 @@ export default function Navigation() {
                   {isActive && (
                     <motion.span
                       layoutId="nav-active"
-                      className="absolute inset-0 rounded-xl bg-primary/15 border border-primary/20"
+                      className="absolute inset-0 rounded-xl border border-primary/35 bg-primary/15 shadow-[0_0_12px_rgba(129,84,255,0.12)]"
                       transition={{ type: "spring", stiffness: 350, damping: 30 }}
                     />
                   )}
@@ -115,7 +113,7 @@ export default function Navigation() {
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
               transition={{ duration: 0.2 }}
               id="mobile-nav-menu"
-              className="glass absolute top-full left-1/2 mt-3 -translate-x-1/2 rounded-2xl p-3"
+              className="nav-galaxy-menu absolute top-full left-1/2 mt-3 -translate-x-1/2 rounded-2xl p-3"
             >
               <ul className="flex min-w-[180px] flex-col gap-0.5">
                 {navLinks.map((link) => (

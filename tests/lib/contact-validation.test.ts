@@ -73,4 +73,20 @@ describe("validateContactForm", () => {
       expect(r.errors.message).toBeDefined();
     }
   });
+
+  it("accepts the configured inquiry options and rejects unknown selections", () => {
+    const valid = validateContactForm({
+      ...VALID,
+      company: "  Studio North  ",
+      projectType: "SaaS",
+      budget: "$1,000 – $3,000",
+      timeline: "1–2 months",
+    });
+    expect(valid.ok).toBe(true);
+    if (valid.ok) expect(valid.data.company).toBe("Studio North");
+
+    const invalid = validateContactForm({ ...VALID, projectType: "Fantasy Project" });
+    expect(invalid.ok).toBe(false);
+    if (!invalid.ok) expect(invalid.errors.projectType).toBeDefined();
+  });
 });

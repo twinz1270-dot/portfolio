@@ -26,14 +26,27 @@ export async function sendContactEmail(input: ContactInput) {
   const from = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
   if (!to) throw new Error("CONTACT_TO_EMAIL is not set");
 
+  const inquiryDetails = [
+    ["Company / Brand", input.company],
+    ["Project Type", input.projectType],
+    ["Budget", input.budget],
+    ["Timeline", input.timeline],
+  ].filter(([, value]) => Boolean(value));
+
+  const detailsHtml = inquiryDetails
+    .map(([label, value]) => `<p><strong>${escapeHtml(label)}</strong>: ${escapeHtml(value)}</p>`)
+    .join("\n");
+  const detailsText = inquiryDetails.map(([label, value]) => `${label}: ${value}`).join("\n");
+
   const html = `
     <h2>New portfolio contact</h2>
     <p><strong>From:</strong> ${escapeHtml(input.name)} &lt;${escapeHtml(input.email)}&gt;</p>
+    ${detailsHtml}
     <p><strong>Message:</strong></p>
     <pre style="white-space:pre-wrap;font-family:ui-sans-serif,system-ui,sans-serif">${escapeHtml(input.message)}</pre>
   `;
 
-  const text = `New portfolio contact\n\nFrom: ${input.name} <${input.email}>\n\nMessage:\n${input.message}\n`;
+  const text = `New portfolio contact\n\nFrom: ${input.name} <${input.email}>\n${detailsText ? `${detailsText}\n` : ""}\nMessage:\n${input.message}\n`;
 
   const result = await getClient().emails.send({
     from,

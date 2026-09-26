@@ -1,60 +1,34 @@
-"use client";
-
-import { useRef } from "react";
-import { motion } from "framer-motion";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "@/lib/gsap-config";
-import { personalInfo } from "@/lib/constants";
+import { languages } from "@/lib/constants";
 import GradientText from "@/components/ui/GradientText";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import SectionDivider from "@/components/ui/SectionDivider";
 
-function AnimatedCounter({ value, label, index }: { value: string; label: string; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
+const strengths = [
+  "Problem Solving",
+  "Attention to Detail",
+  "Communication",
+  "Teamwork",
+  "Adaptability",
+];
 
-  useGSAP(() => {
-    if (!ref.current) return;
-    gsap.from(ref.current, {
-      y: 30,
-      opacity: 0,
-      duration: 0.6,
-      delay: index * 0.15,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: ref.current,
-        start: "top 90%",
-      },
-    });
-  }, { scope: ref });
-
-  return (
-    <motion.div
-      ref={ref}
-      whileHover={{ scale: 1.05, y: -2 }}
-      transition={{ type: "spring", stiffness: 400, damping: 15 }}
-      className="group relative flex flex-col items-center gap-1.5 rounded-xl border border-glass-border bg-galaxy-dark/50 p-4 text-center transition-colors duration-300 hover:border-primary/30 hover:bg-primary/5"
-    >
-      <span className="font-display text-3xl font-bold text-primary sm:text-4xl">
-        {value}
-      </span>
-      <span className="text-xs font-medium uppercase tracking-wider text-text-secondary">
-        {label}
-      </span>
-      {/* Subtle glow on hover */}
-      <div className="absolute inset-0 -z-10 rounded-xl bg-primary/5 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
-    </motion.div>
-  );
-}
+const details = [
+  { label: "Based in", value: "Islamabad, Pakistan" },
+  { label: "Primary focus", value: "Frontend Development" },
+  { label: "Also", value: "UI/UX Design · Software Engineering" },
+  {
+    label: "Interested in",
+    value: "SaaS · E-Commerce · Web Applications · Dashboards · AI Interfaces · Interactive Frontend Experiences",
+  },
+];
 
 export default function About() {
   return (
     <section className="section-padding relative">
       <SectionDivider />
       <div className="mx-auto max-w-5xl">
-        {/* Section header */}
         <ScrollReveal>
           <div className="flex items-center gap-4">
-            <span className="font-display text-sm font-medium tracking-widest text-primary/60 uppercase">01</span>
+            <span className="font-display text-sm font-medium tracking-widest text-primary/60 uppercase">06</span>
             <div className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent" />
           </div>
           <GradientText as="h2" className="mt-4 font-display text-3xl font-bold sm:text-4xl md:text-5xl">
@@ -62,38 +36,52 @@ export default function About() {
           </GradientText>
         </ScrollReveal>
 
-        <div className="mt-12 grid gap-12 lg:grid-cols-5">
-          {/* Bio */}
-          <div className="lg:col-span-3">
-            <ScrollReveal delay={0.1}>
-              <p className="text-lg leading-relaxed text-text-secondary">
-                {personalInfo.bio}
+        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1.45fr)_minmax(17rem,0.75fr)] lg:gap-16">
+          <ScrollReveal delay={0.1}>
+            <p className="max-w-3xl font-display text-xl leading-relaxed text-white sm:text-2xl">
+              I&apos;m a Frontend Developer and Software Engineering graduate focused on creating responsive, intuitive, and visually polished digital experiences.
+            </p>
+            <p className="mt-5 max-w-3xl text-base leading-relaxed text-text-secondary sm:text-lg">
+              My work sits at the intersection of frontend engineering and UI/UX: turning ideas and designs into interfaces that are functional, clear, engaging, and easy to use. I enjoy modern web technologies, component-based development, responsive design, interaction, and design-to-code workflows.
+            </p>
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-text-secondary sm:text-base">
+              I also have practical exposure to UI/UX design and Figma, software testing, APIs, databases, Git workflows, and collaborative software development.
+            </p>
+            <p className="mt-7 border-l border-primary/50 pl-4 font-display text-lg text-primary-light sm:text-xl">
+              Where thoughtful design meets frontend engineering.
+            </p>
+            <div className="mt-8 border-t border-white/[0.08] pt-5">
+              <h3 className="text-xs font-semibold uppercase tracking-widest text-text-secondary/60">
+                How I work
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-text-secondary sm:text-base">
+                {strengths.join(" · ")}
               </p>
-            </ScrollReveal>
-
-            {/* Location badge */}
-            <ScrollReveal delay={0.3}>
-              <div className="badge mt-8 gap-1 whitespace-nowrap rounded-full border border-glass-border bg-glass-bg">
-                <span className="text-sm">📍</span>
-                <span className="text-sm text-text-secondary">Based in <span className="font-medium text-white">{personalInfo.location}</span></span>
-              </div>
-            </ScrollReveal>
-            <div className="mt-14" />
-          </div>
-
-          {/* Stats Grid */}
-          <div className="lg:col-span-2">
-            <div className="grid grid-cols-2 gap-3">
-              {personalInfo.stats.map((stat, i) => (
-                <AnimatedCounter
-                  key={stat.label}
-                  value={stat.value}
-                  label={stat.label}
-                  index={i}
-                />
-              ))}
             </div>
-          </div>
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.2}>
+            <dl className="divide-y divide-white/[0.08] border-y border-white/[0.08]">
+              {details.map((detail) => (
+                <div key={detail.label} className="py-4">
+                  <dt className="text-xs font-semibold uppercase tracking-widest text-text-secondary/60">{detail.label}</dt>
+                  <dd className="mt-1.5 text-sm leading-relaxed text-white sm:text-base">{detail.value}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <div className="mt-6">
+              <h3 className="text-xs font-semibold uppercase tracking-widest text-text-secondary/60">Languages</h3>
+              <ul className="mt-2 divide-y divide-white/[0.08] border-y border-white/[0.08]">
+              {languages.map((language) => (
+                <li key={language.name} className="flex items-center justify-between gap-4 py-3 text-sm sm:text-base">
+                  <span className="text-text-secondary">{language.name}</span>
+                  {language.detail && <span className="text-right text-primary-light">{language.detail}</span>}
+                </li>
+              ))}
+              </ul>
+            </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

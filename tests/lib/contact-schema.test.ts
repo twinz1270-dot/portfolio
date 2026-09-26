@@ -75,4 +75,26 @@ describe("contactSchema", () => {
     expect(r.success).toBe(true);
     if (r.success) expect(r.data.website).toBe("");
   });
+
+  it("accepts project inquiry details and defaults omitted selections", () => {
+    const r = contactSchema.safeParse({
+      ...valid,
+      company: "Studio North",
+      projectType: "SaaS",
+      budget: "$1,000 – $3,000",
+      timeline: "1–2 months",
+    });
+    expect(r.success).toBe(true);
+    if (r.success) {
+      expect(r.data.company).toBe("Studio North");
+      expect(r.data.projectType).toBe("SaaS");
+      expect(r.data.budget).toBe("$1,000 – $3,000");
+      expect(r.data.timeline).toBe("1–2 months");
+    }
+  });
+
+  it("rejects unknown inquiry select values", () => {
+    const r = contactSchema.safeParse({ ...valid, projectType: "Fantasy Project" });
+    expect(r.success).toBe(false);
+  });
 });

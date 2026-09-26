@@ -4,10 +4,15 @@
 // pull Zod's JIT probe into the client bundle (Zod v4 calls `new Function("")`
 // at module load which trips a CSP `unsafe-eval` violation in the console
 // even though the probe is in try/catch).
+import { PROJECT_BUDGETS, PROJECT_TIMELINES, PROJECT_TYPES } from "@/lib/contact-options";
 
 export interface ContactFormData {
   name: string;
   email: string;
+  company: string;
+  projectType: string;
+  budget: string;
+  timeline: string;
   message: string;
   website: string;
 }
@@ -21,6 +26,10 @@ export function validateContactForm(
 ): { ok: true; data: ContactFormData } | { ok: false; errors: ContactFieldErrors } {
   const name = String(raw.name ?? "").trim();
   const email = String(raw.email ?? "").trim();
+  const company = String(raw.company ?? "").trim();
+  const projectType = String(raw.projectType ?? "").trim();
+  const budget = String(raw.budget ?? "").trim();
+  const timeline = String(raw.timeline ?? "").trim();
   const message = String(raw.message ?? "").trim();
   const website = String(raw.website ?? "");
 
@@ -38,6 +47,17 @@ export function validateContactForm(
     errors.email = ["Email must be at most 120 characters"];
   }
 
+  if (company.length > 120) errors.company = ["Company / Brand must be at most 120 characters"];
+  if (projectType && !PROJECT_TYPES.includes(projectType as typeof PROJECT_TYPES[number])) {
+    errors.projectType = ["Select a valid project type"];
+  }
+  if (budget && !PROJECT_BUDGETS.includes(budget as typeof PROJECT_BUDGETS[number])) {
+    errors.budget = ["Select a valid budget"];
+  }
+  if (timeline && !PROJECT_TIMELINES.includes(timeline as typeof PROJECT_TIMELINES[number])) {
+    errors.timeline = ["Select a valid timeline"];
+  }
+
   if (message.length < 10) {
     errors.message = ["Message must be at least 10 characters"];
   } else if (message.length > 2000) {
@@ -51,5 +71,5 @@ export function validateContactForm(
   }
 
   if (Object.keys(errors).length > 0) return { ok: false, errors };
-  return { ok: true, data: { name, email, message, website } };
+  return { ok: true, data: { name, email, company, projectType, budget, timeline, message, website } };
 }

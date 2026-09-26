@@ -1,23 +1,12 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
-import { Code2, Database, Wrench } from "lucide-react";
+import { useState } from "react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { Code2, Wrench, CloudUpload, Database, PanelsTopLeft, Sparkles } from "lucide-react";
 import { skillCategories } from "@/lib/constants";
 import GradientText from "@/components/ui/GradientText";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import SectionDivider from "@/components/ui/SectionDivider";
-
-const categoryIcons: Record<string, React.ReactNode> = {
-  "Frontend": <Code2 size={20} />,
-  "Backend & Data": <Database size={20} />,
-  "Data Science & Tools": <Wrench size={20} />,
-};
-
-const categoryColors: Record<string, string> = {
-  "Frontend": "from-primary to-primary-light",
-  "Backend & Data": "from-secondary to-secondary/60",
-  "Data Science & Tools": "from-accent to-nebula-warm",
-};
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -40,6 +29,8 @@ const badgeVariants: Variants = {
 };
 
 export default function Skills() {
+  const [activeCategory, setActiveCategory] = useState(skillCategories[0].name);
+  const selectedCategory = skillCategories.find((category) => category.name === activeCategory) ?? skillCategories[0];
 
   return (
     <section className="section-padding relative">
@@ -51,59 +42,82 @@ export default function Skills() {
             <div className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent" />
           </div>
           <GradientText as="h2" className="mt-4 font-display text-3xl font-bold sm:text-4xl md:text-5xl">
-            Skills & Technologies
+            Tech Stack
           </GradientText>
           <p className="mt-4 max-w-2xl text-text-secondary">
-            The tools and technologies I use to bring ideas to life.
+            Frontend engineering, interaction, design, and supporting foundations.
           </p>
         </ScrollReveal>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {skillCategories.map((category, catIdx) => {
-            const gradient = categoryColors[category.name] || "from-primary to-primary-light";
-            return (
-              <ScrollReveal key={category.name} delay={catIdx * 0.12}>
-                <div className="group relative overflow-hidden rounded-2xl border border-glass-border bg-galaxy-dark/50 p-6 transition-all duration-500 hover:border-primary/20">
-                  {/* Top gradient accent */}
-                  <div className={`absolute left-0 right-0 top-0 h-px bg-gradient-to-r ${gradient} opacity-40 transition-opacity duration-300 group-hover:opacity-100`} />
+        <ScrollReveal delay={0.08}>
+          <div role="group" aria-label="Technology categories" className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+            {skillCategories.map((category, index) => {
+              const selected = selectedCategory.name === category.name;
+              return (
+                <button
+                  key={category.name}
+                  type="button"
+                  onClick={() => setActiveCategory(category.name)}
+                  aria-pressed={selected}
+                  className={`flex min-h-14 items-center gap-2 rounded-xl border px-3 py-2 text-left transition-colors sm:px-4 ${
+                    selected
+                      ? "border-primary/30 bg-primary/10 text-white"
+                      : "border-glass-border bg-galaxy-dark/40 text-text-secondary hover:border-primary/20 hover:text-white"
+                  }`}
+                >
+                  <span className="shrink-0 font-display text-xs font-semibold text-primary-light/80">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="text-sm leading-snug">{category.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </ScrollReveal>
 
-                  {/* Category header */}
-                  <div className="mb-5 flex items-center gap-3">
-                    <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br ${gradient} text-white shadow-lg`}>
-                      {categoryIcons[category.name] || <Code2 size={20} />}
-                    </div>
-                    <h3 className="font-display text-base font-semibold text-white">
-                      {category.name}
-                    </h3>
-                  </div>
-
-                  {/* Skills grid */}
-                  <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    className="flex flex-wrap gap-2"
-                  >
-                    {category.skills.map((skill) => (
-                      <motion.span
-                        key={skill.name}
-                        variants={badgeVariants}
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        className="badge cursor-default rounded-lg border border-glass-border bg-galaxy-darker/60 text-sm font-medium text-text-secondary transition-all duration-300 hover:border-primary/30 hover:text-white hover:shadow-[0_0_15px_rgba(129,84,255,0.15)]"
-                      >
-                        {skill.name}
-                      </motion.span>
-                    ))}
-                  </motion.div>
-
-                  {/* Hover glow */}
-                  <div className="pointer-events-none absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-primary/5 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
-                </div>
-              </ScrollReveal>
-            );
-          })}
-        </div>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={selectedCategory.name}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.24, ease: "easeOut" }}
+            className="mt-8 min-h-40 border-l border-primary/25 pl-5 sm:pl-7"
+            aria-live="polite"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-primary-light">
+                {selectedCategory.name.includes("Data") ? <Database size={20} /> :
+                  selectedCategory.name.includes("Deployment") ? <CloudUpload size={20} /> :
+                  selectedCategory.name.includes("Tool") ? <Wrench size={20} /> :
+                    selectedCategory.name.includes("Animation") ? <Sparkles size={20} /> :
+                    selectedCategory.name.includes("UI") || selectedCategory.name.includes("Styling") ? <PanelsTopLeft size={20} /> :
+                      <Code2 size={20} />}
+              </span>
+              <h3 className="font-display text-lg font-semibold text-white sm:text-xl">{selectedCategory.name}</h3>
+            </div>
+            {selectedCategory.description && (
+              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-text-secondary">{selectedCategory.description}</p>
+            )}
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="mt-5 flex flex-wrap gap-2"
+            >
+              {selectedCategory.skills.map((skill) => (
+                <motion.span
+                  key={skill.name}
+                  variants={badgeVariants}
+                  whileHover={{ scale: 1.04, y: -1 }}
+                  className="badge cursor-default rounded-lg border border-glass-border bg-galaxy-darker/60 text-sm font-medium text-text-secondary transition-colors hover:border-primary/30 hover:text-white"
+                >
+                  {skill.name}
+                </motion.span>
+              ))}
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   );

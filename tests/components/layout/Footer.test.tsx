@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import Footer from "@/components/layout/Footer";
+import { personalInfo } from "@/lib/constants";
 
 const scrollToMock = vi.fn();
 vi.mock("lenis/react", () => ({
@@ -15,7 +16,7 @@ describe("<Footer />", () => {
     render(<Footer />);
     const year = new Date().getFullYear().toString();
     expect(screen.getByText(new RegExp(`${year}`))).toBeInTheDocument();
-    expect(screen.getByText(/Pedro Marques/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(personalInfo.name))).toBeInTheDocument();
   });
 
   it("shows the 'Built with…' tagline", () => {

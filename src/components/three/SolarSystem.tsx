@@ -4,17 +4,15 @@ import { useRef, useMemo, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
-import { projects } from "@/lib/constants";
+import { projects } from "@/lib/projects";
 import { useScrollProgress } from "@/hooks/useScrollProgress";
 import { useQuality } from "@/hooks/useQuality";
 
 const CX = 30, CY = 0, CZ = 0;
 const SUN_POS = new THREE.Vector3(CX, CY, CZ);
 
-// Shared planet positions — read by ScrollCamera to follow planets
-export const planetPositions: THREE.Vector3[] = [
-  new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(),
-];
+// Shared planet positions — read by ScrollCamera to follow project planets
+export const planetPositions: THREE.Vector3[] = projects.map(() => new THREE.Vector3());
 
 // ===================== EARTH SHADER =====================
 const earthVert = /* glsl */ `
@@ -101,6 +99,15 @@ const PLANET_CONFIGS: PlanetConfig[] = [
   { orbitRadius: 15, orbitSpeed: 0.035, size: 1.8, texture: "/textures/2k_jupiter.webp", atmosphere: "#ddbb77", twilight: "#aa7744", tilt: 0.05, hasRing: false, isEarth: false },
   { orbitRadius: 20, orbitSpeed: 0.02, size: 1.4, texture: "/textures/2k_saturn.webp", atmosphere: "#eedd88", twilight: "#aa8833", tilt: 0.47, hasRing: true, isEarth: false },
 ];
+
+const ORBIT_STAGE_SPACING = PLANET_CONFIGS[PLANET_CONFIGS.length - 1].orbitRadius + 10;
+const PROJECT_PLANET_CONFIGS = projects.map((_, index) => {
+  const baseConfig = PLANET_CONFIGS[index % PLANET_CONFIGS.length];
+  const orbitStage = Math.floor(index / PLANET_CONFIGS.length);
+  return orbitStage === 0
+    ? baseConfig
+    : { ...baseConfig, orbitRadius: baseConfig.orbitRadius + orbitStage * ORBIT_STAGE_SPACING };
+});
 
 // ===================== SUN CORONA SHADER =====================
 const coronaVert = /* glsl */ `
@@ -372,12 +379,12 @@ export default function SolarSystem() {
       <pointLight position={[CX, CY, CZ]} intensity={12} color="#fff5e0" distance={60} decay={1.5} />
       <ambientLight intensity={0.03} />
       <Sun />
-      {PLANET_CONFIGS.map((c, i) => <OrbitRing key={`o-${i}`} radius={c.orbitRadius} />)}
+      {PROJECT_PLANET_CONFIGS.map((config, i) => <OrbitRing key={`o-${i}`} radius={config.orbitRadius} />)}
       {projects.map((p, i) => {
-        const config = PLANET_CONFIGS[i] || PLANET_CONFIGS[0];
+        const config = PROJECT_PLANET_CONFIGS[i] || PLANET_CONFIGS[0];
         return config.isEarth
-          ? <EarthPlanet key={p.id} config={config} index={i} />
-          : <RockyPlanet key={p.id} config={config} index={i} />;
+          ? <EarthPlanet key={p.slug} config={config} index={i} />
+          : <RockyPlanet key={p.slug} config={config} index={i} />;
       })}
     </group>
   );

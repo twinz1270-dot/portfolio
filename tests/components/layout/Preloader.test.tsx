@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import Preloader from "@/components/layout/Preloader";
+import { personalInfo } from "@/lib/constants";
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -18,12 +19,12 @@ afterEach(() => {
 describe("<Preloader />", () => {
   it("renders the preloader UI on mount", () => {
     render(<Preloader />);
-    expect(screen.getByText(/Pedro Marques/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(personalInfo.name, "i"))).toBeInTheDocument();
   });
 
   it("hides after fonts + scene-ready + min wait have all resolved", async () => {
     render(<Preloader />);
-    expect(screen.getByText(/Pedro Marques/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(personalInfo.name, "i"))).toBeInTheDocument();
 
     // Dispatch scene-ready immediately
     act(() => {
@@ -45,13 +46,13 @@ describe("<Preloader />", () => {
 
     // The preloader's removal is animated; confirm dismissal triggers (wait, then check)
     // Use queryByText since the element may exit but still be in the DOM mid-animation.
-    const heading = screen.queryByText(/Pedro Marques/i);
+    const heading = screen.queryByText(new RegExp(personalInfo.name, "i"));
     expect(heading === null || heading.closest("[style*='opacity']")).toBeTruthy();
   });
 
   it("uses the 5/3-second fallback if scene-ready never fires", async () => {
     render(<Preloader />);
-    expect(screen.getByText(/Pedro Marques/i)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(personalInfo.name, "i"))).toBeInTheDocument();
 
     // Don't dispatch scene-ready; the fallback timer will resolve at 3s
     await act(async () => {
